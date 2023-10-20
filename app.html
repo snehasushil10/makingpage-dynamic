@@ -53,16 +53,36 @@ axios.post("https://crudcrud.com/api/b91b70e520e442e0931084f426dc97fe/Appointmen
   //  event.target.aemail.value = '';
    // event.target.num.value = '';
 }
-
+window.addEventListener("DOMContentLoaded",()=>{
+  axios.get("https://crudcrud.com/api/b91b70e520e442e0931084f426dc97fe/AppointmentData")
+  .then((response)=>{
+    console.log(response)
+    for(var i=0;i < response.data.length; i++)
+    {
+      showuseronscreen(response.data[i])
+    }
+  })
+  .catch((error)=>{
+    console.log(error)
+  })
+ // const localStorageObj =localStorage;
+  //const localstoragekeys =Object.keys(localStorageObj)
+ // for(var i=0;i<localstoragekeys.length;i++){
+  //  const key =localstoragekeys[i]
+   // const userDetailString = localStorageObj[key];
+    //const userDetailsObj =JSON.parse(userDetailString);
+    //showuseronscreen(userDetailsObj)
+  //}
+})
   function showuseronscreen(data)
   {
     var li=document.createElement('li');
     li.className='newline';
-    li.appendChild(document.createTextNode(document.getElementById('aname').value));
+    li.appendChild(document.createTextNode(data.username));
     li.appendChild(document.createTextNode(' - '));
-    li.appendChild(document.createTextNode(document.getElementById('aemail').value));
+    li.appendChild(document.createTextNode(data.email));
     li.appendChild(document.createTextNode(' - '));
-    li.appendChild(document.createTextNode(document.getElementById('num').value));
+    li.appendChild(document.createTextNode(data.phonenumber));
 
     //add delete button in new li
     var delbtn=document.createElement('button');
