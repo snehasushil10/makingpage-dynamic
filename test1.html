@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>scalable app</title>
+</head>
+<body>
+    <form onsubmit="savetocloud(event)">
+        <label for="todo">Todo Name:</label>
+        <input type="text" id="todo" name="todo" >
+        <label for="des">Description:</label>
+        <input type="des" id="des" name="des" >
+        <input type="submit" id="submitbtn" value="Add item">
+    </form>
+    <div class="right">
+        <h3>Todos Remaining</h3>
+        <div id="post-remaining"></div>
+      </div>
+      <div class="right">
+        <h3>Todos done</h3>
+        <div id="post-done"></div>
+      </div>
+    <ul id="line">
+        <!-- <li class="newline"></li> -->
+    </ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.1/axios.min.js"></script>
+    <script>
+   const itemlistRemaining = document.getElementById('post-remaining');
+    const itemlistDone = document.getElementById('post-done');
+
+function savetocloud(event)
+{
+    event.preventDefault();
+   const todoname=event.target.todo.value;
+   const descrp=event.target.des.value;
+
+   //storing user detail as object
+ myobj={
+  todoname,
+  descrp
+};
+//storing to local value
+myobj_serialized=JSON.stringify(myobj);
+//localStorage.setItem(myobj.email,myobj_serialized);
+axios.post("https://crudcrud.com/api/d9d8c5983c56469badc2088d0d6b83a2/todolist",myobj)
+.then((response)=>{
+    showuseronscreen(response.data,itemlistRemaining)
+    console.log(response);
+}).catch((err)=>{
+    console.log(err)
+})
+}
+window.addEventListener("DOMContentLoaded",()=>{
+  axios.get("https://crudcrud.com/api/d9d8c5983c56469badc2088d0d6b83a2/todolist")
+  .then((response)=>{
+    console.log(response)
+    for(var i=0;i < response.data.length; i++)
+    {
+      showuseronscreen(response.data[i],itemlistRemaining)
+    }
+  })
+  .catch((error)=>{
+    console.log(error)
+  })
+})
+  function showuseronscreen(data,itemlist)
+  {
+    var li=document.createElement('li');
+    li.className='newline';
+    li.appendChild(document.createTextNode(data.todoname));
+    li.appendChild(document.createTextNode(' - '));
+    li.appendChild(document.createTextNode(data.descrp));
+
+    //add delete button in new li
+    var delbtn=document.createElement('button');
+    delbtn.className='del';
+    //adding content delete in delbtn
+    delbtn.appendChild(document.createTextNode('X'));
+    //adding edit btn and content in edit button
+    var done=document.createElement('button');
+    done.className='submit';
+    done.appendChild(document.createTextNode('✔'));
+    //appending created element to li.
+    li.appendChild(delbtn);
+    li.appendChild(done);
+    //appending li to itemlist.
+    itemlist.appendChild(li);
+
+    done.addEventListener('click', () => {
+    itemlistRemaining.removeChild(li);
+    showuseronscreen(data, itemlistDone);
+    })
+
+//removing data from local storage on clicking delete button
+delbtn.addEventListener ('click',() => {
+    axios.delete(`https://crudcrud.com/api/d9d8c5983c56469badc2088d0d6b83a2/todolist/${data._id}`)
+    .then(()=>{
+        const parentList = li.parentNode;
+        parentList.removeChild(li);
+    }).catch((error)=>{
+      console.log(error)
+    })
+   
+})
+  }
+
+    </script>
+</body>
+</html>
